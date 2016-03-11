@@ -15,6 +15,8 @@
 		9829A1771C9351BB004194E1 /* CoreTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9829A1761C9351BB004194E1 /* CoreTestTests.swift */; };
 		9829A1821C9351BB004194E1 /* CoreTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9829A1811C9351BB004194E1 /* CoreTestUITests.swift */; };
 		9829A1901C93526A004194E1 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9829A18F1C93526A004194E1 /* CoreMotion.framework */; };
+		9829A1921C93883F004194E1 /* boom.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9829A1911C93883F004194E1 /* boom.mp3 */; };
+		9829A1941C938A3B004194E1 /* ShortSlap.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9829A1931C938A3B004194E1 /* ShortSlap.m4a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		9829A1811C9351BB004194E1 /* CoreTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTestUITests.swift; sourceTree = "<group>"; };
 		9829A1831C9351BB004194E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9829A18F1C93526A004194E1 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		9829A1911C93883F004194E1 /* boom.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boom.mp3; sourceTree = "<group>"; };
+		9829A1931C938A3B004194E1 /* ShortSlap.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = ShortSlap.m4a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +111,8 @@
 				9829A1681C9351BB004194E1 /* Assets.xcassets */,
 				9829A16A1C9351BB004194E1 /* LaunchScreen.storyboard */,
 				9829A16D1C9351BB004194E1 /* Info.plist */,
+				9829A1911C93883F004194E1 /* boom.mp3 */,
+				9829A1931C938A3B004194E1 /* ShortSlap.m4a */,
 			);
 			path = CoreTest;
 			sourceTree = "<group>";
@@ -235,8 +241,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9829A16C1C9351BB004194E1 /* LaunchScreen.storyboard in Resources */,
+				9829A1941C938A3B004194E1 /* ShortSlap.m4a in Resources */,
 				9829A1691C9351BB004194E1 /* Assets.xcassets in Resources */,
 				9829A1671C9351BB004194E1 /* Main.storyboard in Resources */,
+				9829A1921C93883F004194E1 /* boom.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

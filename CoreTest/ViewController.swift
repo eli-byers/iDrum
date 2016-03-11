@@ -8,19 +8,30 @@
 
 import UIKit
 import CoreMotion
+import AVFoundation
+
 
 class ViewController: UIViewController {
+    
+    // drup variables
+    var frontDrumAcc = 0.0
+    var frontDrumMove = false
+    var leftDrumAcc = 0.0
+    var leftDrumMove = false
+    var rightDrumAcc = 0.0
+    var rightDrumMove = false
+    
     
     //    Instance Variables
     var currentMaxAccelX = 0.0
     var currentMaxAccelY = 0.0
     var currentMaxAccelZ = 0.0
-    var currentMaxRotX = 0.0
-    var currentMaxRotY = 0.0
-    var currentMaxRotZ = 0.0
+
     
     var motionManager = CMMotionManager()
+    var mySound = AVAudioPlayer()
     
+
     // Outlets
     @IBOutlet weak var accX: UILabel!
     @IBOutlet weak var accY: UILabel!
@@ -28,21 +39,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var maxAccX: UILabel!
     @IBOutlet weak var maxAccY: UILabel!
     @IBOutlet weak var maxAccZ: UILabel!
-    @IBOutlet weak var rotX: UILabel!
-    @IBOutlet weak var rotY: UILabel!
-    @IBOutlet weak var rotZ: UILabel!
-    @IBOutlet weak var maxRotX: UILabel!
-    @IBOutlet weak var maxRotY: UILabel!
-    @IBOutlet weak var maxRotZ: UILabel!
     
     
     @IBAction func resetMaxValues() {
         currentMaxAccelX = 0.0
         currentMaxAccelY = 0.0
         currentMaxAccelZ = 0.0
-        currentMaxRotX = 0.0
-        currentMaxRotY = 0.0
-        currentMaxRotZ = 0.0
     }
     
     //Functions
@@ -50,30 +52,70 @@ class ViewController: UIViewController {
         
         self.resetMaxValues()
         
-        motionManager.gyroUpdateInterval = 0.2
-        motionManager.accelerometerUpdateInterval = 0.2
+        motionManager.accelerometerUpdateInterval = 0git
         
         //Start Recording Data
+
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!) { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
-            
+        
             self.outputAccData(accelerometerData!.acceleration)
+            
             if(NSError != nil) {
                 print("\(NSError)")
             }
         }
         
-        motionManager.startGyroUpdatesToQueue(NSOperationQueue.currentQueue()!, withHandler: { (gyroData: CMGyroData?, NSError) -> Void in
-            self.outputRotData(gyroData!.rotationRate)
-            if (NSError != nil){
-                print("\(NSError)")
+        super.viewDidLoad()
+        
+        let myPathString = NSBundle.mainBundle().pathForResource("ShortSlap", ofType: "m4a")
+        if let myPathString = myPathString{
+            let myPathURL = NSURL(fileURLWithPath: myPathString)
+            
+            do{
+                try mySound = AVAudioPlayer(contentsOfURL: myPathURL)
+//                mySound.play()
+            } catch{
+                print("error")
             }
-            
-            
-        })
+        }
+
         
     }
     
+    
     func outputAccData(acceleration: CMAcceleration){
+        
+        let limit = 4.0
+        
+        
+        if !leftDrumMove && acceleration.x < -limit {
+            leftDrumMove = true
+            frontDrumMove = false
+            rightDrumMove = false
+        } else if leftDrumMove && acceleration.x >= 1 {
+            leftDrumMove = false
+            leftDrum()
+        }
+        
+        if !rightDrumMove && acceleration.x > limit {
+            rightDrumMove = true
+            frontDrumMove = false
+            leftDrumMove = false
+        } else if rightDrumMove && acceleration.x <= 1 {
+            rightDrumMove = false
+            rightDrum()
+        }
+        
+        if !frontDrumMove && acceleration.y > limit {
+            frontDrumMove = true
+            leftDrumMove = false
+            rightDrumMove = false
+        } else if frontDrumMove && acceleration.y <= 1 {
+            frontDrumMove = false
+            frontDrum()
+        }
+        
+        
         
         accX?.text = "\(acceleration.x).2fg"
         if fabs(acceleration.x) > fabs(currentMaxAccelX){
@@ -98,34 +140,26 @@ class ViewController: UIViewController {
         
     }
     
-    func outputRotData(rotation: CMRotationRate){
-        
-        
-        rotX?.text = "\(rotation.x).2fr/s"
-        if fabs(rotation.x) > fabs(currentMaxRotX){
-            currentMaxRotX = rotation.x
-        }
-        
-        rotY?.text = "\(rotation.y).2fr/s"
-        if fabs(rotation.y) > fabs(currentMaxRotY){
-            currentMaxRotY = rotation.y
-        }
-        
-        rotZ?.text = "\(rotation.z).2fr/s"
-        if fabs(rotation.z) > fabs(currentMaxRotZ){
-            currentMaxRotZ = rotation.z
-        }
-        
-        
-        
-        
-        maxRotX?.text = "\(currentMaxRotX).2f"
-        maxRotY?.text = "\(currentMaxRotY).2f"
-        maxRotZ?.text = "\(currentMaxRotZ).2f"
-        
-        
-        
+    func leftDrum() {
+        print("<--")
+        slap()
     }
+    
+    func frontDrum(){
+        print("^")
+        slap()
+    }
+    
+    func rightDrum() {
+        print("-->")
+        slap()
+    }
+    
+    func slap(){
+       mySound.play()
+    }
+
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
