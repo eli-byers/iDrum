@@ -13,71 +13,88 @@ import AVFoundation
 
 class ViewController: UIViewController {
     
-    // drup variables
+    // drum variables
     var frontDrumAcc = 0.0
     var frontDrumMove = false
+    var frontDrumHit = false
+    
     var leftDrumAcc = 0.0
     var leftDrumMove = false
+    var leftDrumHit = false
+
     var rightDrumAcc = 0.0
     var rightDrumMove = false
-    
-    
-    //    Instance Variables
-    var currentMaxAccelX = 0.0
-    var currentMaxAccelY = 0.0
-    var currentMaxAccelZ = 0.0
+    var rightDrumHit = false
 
+    // control variables
+    let limit = 4.0
+    let center = 1.0
+    let resetDelay = 0.1
     
+    // managers
     var motionManager = CMMotionManager()
-    var mySound = AVAudioPlayer()
-    
-
-    // Outlets
-    @IBOutlet weak var accX: UILabel!
-    @IBOutlet weak var accY: UILabel!
-    @IBOutlet weak var accZ: UILabel!
-    @IBOutlet weak var maxAccX: UILabel!
-    @IBOutlet weak var maxAccY: UILabel!
-    @IBOutlet weak var maxAccZ: UILabel!
+    var kickSound = AVAudioPlayer()
+    var highHatSound = AVAudioPlayer()
+    var snareSound = AVAudioPlayer()
     
     
-    @IBAction func resetMaxValues() {
-        currentMaxAccelX = 0.0
-        currentMaxAccelY = 0.0
-        currentMaxAccelZ = 0.0
-    }
-    
-    //Functions
+    // Functions
     override func viewDidLoad() {
         
-        self.resetMaxValues()
-        
-        motionManager.accelerometerUpdateInterval = 0git
-        
-        //Start Recording Data
+        super.viewDidLoad()
 
-        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!) { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
+        motionManager.accelerometerUpdateInterval = 0.001
         
+        // Start Recording Data
+        motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!) { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
+            
             self.outputAccData(accelerometerData!.acceleration)
             
             if(NSError != nil) {
                 print("\(NSError)")
             }
         }
-        
-        super.viewDidLoad()
-        
-        let myPathString = NSBundle.mainBundle().pathForResource("ShortSlap", ofType: "m4a")
-        if let myPathString = myPathString{
-            let myPathURL = NSURL(fileURLWithPath: myPathString)
+
+        // Kick sound
+        let kick = NSBundle.mainBundle().pathForResource("Kick", ofType: "wav")
+        if let kick = kick{
+            let myPathURL = NSURL(fileURLWithPath: kick)
             
             do{
-                try mySound = AVAudioPlayer(contentsOfURL: myPathURL)
-//                mySound.play()
+                try kickSound = AVAudioPlayer(contentsOfURL: myPathURL)
+                //                mySound.play()
             } catch{
                 print("error")
             }
         }
+        
+        // High Hat Sound
+        let highHat = NSBundle.mainBundle().pathForResource("HighHat", ofType: "mp3")
+        if let highHat = highHat{
+            let myPathURL = NSURL(fileURLWithPath: highHat)
+            
+            do{
+                try highHatSound = AVAudioPlayer(contentsOfURL: myPathURL)
+                //                mySound.play()
+            } catch{
+                print("error")
+            }
+        }
+        
+        // Snare Sound
+        let snare = NSBundle.mainBundle().pathForResource("Snare", ofType: "m4a")
+        if let snare = snare{
+            let myPathURL = NSURL(fileURLWithPath: snare)
+            
+            do{
+                try snareSound = AVAudioPlayer(contentsOfURL: myPathURL)
+                //                mySound.play()
+            } catch{
+                print("error")
+            }
+        }
+        
+        
 
         
     }
@@ -85,79 +102,115 @@ class ViewController: UIViewController {
     
     func outputAccData(acceleration: CMAcceleration){
         
-        let limit = 4.0
+        // put acceleratins in object and only pass on the largest one <-- need to do
         
-        
-        if !leftDrumMove && acceleration.x < -limit {
-            leftDrumMove = true
-            frontDrumMove = false
-            rightDrumMove = false
-        } else if leftDrumMove && acceleration.x >= 1 {
-            leftDrumMove = false
-            leftDrum()
+        switch (acceleration.x < -limit, acceleration.z < -limit, acceleration.x > limit){
+            case (true, _, _):
+                if (!frontDrumMove && !rightDrumMove) {
+                    leftDrumMove = true
+                }
+            case (_, true, _):
+                if (!leftDrumMove && !rightDrumMove) {
+                    frontDrumMove = true
+                }
+            case (_, _, true):
+                if (!leftDrumMove && !frontDrumMove) {
+                    rightDrumMove = true
+                }
+            default: break
         }
         
-        if !rightDrumMove && acceleration.x > limit {
-            rightDrumMove = true
-            frontDrumMove = false
-            leftDrumMove = false
-        } else if rightDrumMove && acceleration.x <= 1 {
-            rightDrumMove = false
-            rightDrum()
+        switch (leftDrumMove, frontDrumMove, rightDrumMove) {
+            case (true, _, _):
+                if acceleration.x >= -center {
+                    leftDrum()
+                }
+            case (_, true, _):
+                if acceleration.z >= center {
+                    frontDrum()
+                }
+            case (_, _, true):
+                if acceleration.x <= center {
+                    rightDrum()
+                }
+            default: break
         }
-        
-        if !frontDrumMove && acceleration.y > limit {
-            frontDrumMove = true
-            leftDrumMove = false
-            rightDrumMove = false
-        } else if frontDrumMove && acceleration.y <= 1 {
-            frontDrumMove = false
-            frontDrum()
-        }
-        
-        
-        
-        accX?.text = "\(acceleration.x).2fg"
-        if fabs(acceleration.x) > fabs(currentMaxAccelX){
-            currentMaxAccelX = acceleration.x
-        }
-        
-        accY?.text = "\(acceleration.y).2fg"
-        if fabs(acceleration.y) > fabs(currentMaxAccelY){
-            currentMaxAccelY = acceleration.y
-        }
-        
-        accZ?.text = "\(acceleration.z).2fg"
-        if fabs(acceleration.z) > fabs(currentMaxAccelZ){
-            currentMaxAccelZ = acceleration.z
-        }
-        
-        
-        maxAccX?.text = "\(currentMaxAccelX).2f"
-        maxAccY?.text = "\(currentMaxAccelY).2f"
-        maxAccZ?.text = "\(currentMaxAccelZ).2f"
-        
         
     }
     
+    
+    
     func leftDrum() {
+        highHatSound.play()
+        delay(resetDelay){
+            self.leftDrumMove = false
+        }
         print("<--")
-        slap()
     }
     
     func frontDrum(){
+        kickSound.play()
+        delay(resetDelay){
+            self.frontDrumMove = false
+        }
         print("^")
-        slap()
     }
+    
     
     func rightDrum() {
+        snareSound.play()
+        delay(resetDelay){
+            self.rightDrumMove = false
+        }
         print("-->")
-        slap()
     }
     
-    func slap(){
-       mySound.play()
+    func delay(delay:Double, closure:()->()) {
+        
+        dispatch_after(
+            dispatch_time( DISPATCH_TIME_NOW, Int64(delay * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), closure)
+        
     }
+    
+    
+
+        
+//        func noDrum() -> Bool {
+//            if leftDrumMove || rightDrumMove || frontDrumMove {
+//                return false
+//            } else {
+//                return true
+//            }
+//        }
+        
+        
+//        if noDrum() && acceleration.x < -limit {
+//            leftDrumMove = true
+//        } else if leftDrumMove && acceleration.x >= -center {
+//            leftDrumMove = false
+//            leftDrum()
+//        }
+//        
+//        if noDrum() && acceleration.x > limit {
+//            rightDrumMove = true
+//        } else if rightDrumMove && acceleration.x <= center {
+//            rightDrumMove = false
+//            rightDrum()
+//        }
+//        
+//        if noDrum() && acceleration.y < -limit {
+//            frontDrumMove = true
+//        } else if frontDrumMove && acceleration.y <= center {
+//            frontDrumMove = false
+//            frontDrum()
+//        }
+        
+        
+    func slap(){
+//        mySound.play()
+    }
+    
+    
 
     
     
