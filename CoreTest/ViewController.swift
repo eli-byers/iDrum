@@ -10,8 +10,18 @@ import UIKit
 import CoreMotion
 import AVFoundation
 
-
 class ViewController: UIViewController {
+    
+    @IBOutlet weak var pitchLabel: UILabel!
+    @IBOutlet weak var rollLabel: UILabel!
+    
+    // attitude variables
+    var initialAttitude: (roll: Double, pitch: Double)?
+    var deviceAttitude: (roll: Double, pitch: Double)?
+    
+    var resetFlag = false
+    
+    let queue = NSOperationQueue.mainQueue
     
     // drum variables
     var frontDrumAcc = 0.0
@@ -26,9 +36,9 @@ class ViewController: UIViewController {
     var rightDrumMove = false
     var rightDrumHit = false
 
-    // control variables
-    let limit = 4.0
-    let center = 1.0
+    // acceleration control variables
+    let limit = 5.5
+    let center = 0.0
     let resetDelay = 0.1
     
     // managers
@@ -38,14 +48,42 @@ class ViewController: UIViewController {
     var snareSound = AVAudioPlayer()
     
     
+
     // Functions
     override func viewDidLoad() {
         
         super.viewDidLoad()
 
-        motionManager.accelerometerUpdateInterval = 0.001
+        // attitude
+        motionManager.deviceMotionUpdateInterval = 1 / 30
         
-        // Start Recording Data
+        motionManager.startDeviceMotionUpdatesToQueue(queue())
+            {
+                (deviceMotionData: CMDeviceMotion?, error: NSError?) in
+                
+                if let deviceMotionData = deviceMotionData
+                {
+                    if (self.initialAttitude == nil || self.resetFlag)
+                    {
+                        self.resetFlag = false
+                        self.initialAttitude = (deviceMotionData.attitude.roll,
+                            deviceMotionData.attitude.pitch)
+                        
+//                        self.rollLabel.text = String(Float(self.initialAttitude!.roll))
+//                        self.pitchLabel.text = String(Float(self.initialAttitude!.pitch))
+                        
+                    }
+                    
+                    self.rollLabel.text = String(Float(self.initialAttitude!.roll - deviceMotionData.attitude.roll))
+                    self.pitchLabel.text = String(Float(self.initialAttitude!.pitch - deviceMotionData.attitude.pitch))
+                    
+                }
+                
+        }
+
+        
+        // acceleration
+        motionManager.accelerometerUpdateInterval = 0.001
         motionManager.startAccelerometerUpdatesToQueue(NSOperationQueue.currentQueue()!) { (accelerometerData: CMAccelerometerData?, NSError) -> Void in
             
             self.outputAccData(accelerometerData!.acceleration)
@@ -104,35 +142,67 @@ class ViewController: UIViewController {
         
         // put acceleratins in object and only pass on the largest one <-- need to do
         
-        switch (acceleration.x < -limit, acceleration.z < -limit, acceleration.x > limit){
-            case (true, _, _):
-                if (!frontDrumMove && !rightDrumMove) {
-                    leftDrumMove = true
-                }
-            case (_, true, _):
-                if (!leftDrumMove && !rightDrumMove) {
-                    frontDrumMove = true
-                }
-            case (_, _, true):
-                if (!leftDrumMove && !frontDrumMove) {
-                    rightDrumMove = true
-                }
-            default: break
+//        switch (acceleration.x < -limit, acceleration.z < -limit, acceleration.x > limit){
+//            case (true, _, _):
+//                if (!frontDrumMove && !rightDrumMove) {
+//                    leftDrumMove = true
+//                }
+//            case (_, true, _):
+//                if (!leftDrumMove && !rightDrumMove) {
+//                    frontDrumMove = true
+//                }
+//            case (_, _, true):
+//                if (!leftDrumMove && !frontDrumMove) {
+//                    rightDrumMove = true
+//                }
+//            
+//            case (false, _, _): leftDrumMove = false
+//            case (_, false, _): frontDrumMove = false
+//            case (_, _, false): rightDrumMove = false
+//            default: break
+//        }
+//        
+//        switch (leftDrumMove, frontDrumMove, rightDrumMove) {
+//            case (true, _, _):
+//                if acceleration.x >= -center {
+//                    leftDrum()
+//                }
+//            case (_, true, _):
+//                if acceleration.z >= center {
+//                    frontDrum()
+//                }
+//            case (_, _, true):
+//                if acceleration.x <= center {
+//                    rightDrum()
+//                }
+//            default: break
+//        }
+        
+        if noDrum() && acceleration.x < -limit {
+            leftDrumMove = true
+        } else if leftDrumMove && acceleration.x >= -center {
+            leftDrumMove = false
+            leftDrum()
+        }
+
+        if noDrum() && acceleration.x > limit {
+            rightDrumMove = true
+        } else if rightDrumMove && acceleration.x <= center {
+            rightDrumMove = false
+            rightDrum()
+        }
+
+        if noDrum() && acceleration.z < -limit {
+            frontDrumMove = true
+        } else if frontDrumMove && acceleration.z >= center {
+            frontDrumMove = false
+            frontDrum()
         }
         
-        switch (leftDrumMove, frontDrumMove, rightDrumMove) {
-            case (true, _, _):
-                if acceleration.x >= -center {
-                    leftDrum()
-                }
-            case (_, true, _):
-                if acceleration.z >= center {
-                    frontDrum()
-                }
-            case (_, _, true):
-                if acceleration.x <= center {
-                    rightDrum()
-                }
+        switch (acceleration.x < -limit, acceleration.z < -limit, acceleration.x > limit){
+            case (false, _, _): leftDrumMove = false
+            case (_, false, _): frontDrumMove = false
+            case (_, _, false): rightDrumMove = false
             default: break
         }
         
@@ -145,7 +215,7 @@ class ViewController: UIViewController {
         delay(resetDelay){
             self.leftDrumMove = false
         }
-        print("<--")
+        print("<")
     }
     
     func frontDrum(){
@@ -153,7 +223,7 @@ class ViewController: UIViewController {
         delay(resetDelay){
             self.frontDrumMove = false
         }
-        print("^")
+        print(" ^")
     }
     
     
@@ -162,7 +232,7 @@ class ViewController: UIViewController {
         delay(resetDelay){
             self.rightDrumMove = false
         }
-        print("-->")
+        print("  >")
     }
     
     func delay(delay:Double, closure:()->()) {
@@ -172,45 +242,14 @@ class ViewController: UIViewController {
         
     }
     
-    
-
         
-//        func noDrum() -> Bool {
-//            if leftDrumMove || rightDrumMove || frontDrumMove {
-//                return false
-//            } else {
-//                return true
-//            }
-//        }
-        
-        
-//        if noDrum() && acceleration.x < -limit {
-//            leftDrumMove = true
-//        } else if leftDrumMove && acceleration.x >= -center {
-//            leftDrumMove = false
-//            leftDrum()
-//        }
-//        
-//        if noDrum() && acceleration.x > limit {
-//            rightDrumMove = true
-//        } else if rightDrumMove && acceleration.x <= center {
-//            rightDrumMove = false
-//            rightDrum()
-//        }
-//        
-//        if noDrum() && acceleration.y < -limit {
-//            frontDrumMove = true
-//        } else if frontDrumMove && acceleration.y <= center {
-//            frontDrumMove = false
-//            frontDrum()
-//        }
-        
-        
-    func slap(){
-//        mySound.play()
+    func noDrum() -> Bool {
+        if leftDrumMove || rightDrumMove || frontDrumMove {
+            return false
+        } else {
+            return true
+        }
     }
-    
-    
 
     
     

@@ -59,19 +59,55 @@
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="45"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Pitch:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T4o-C1-iD0">
+                                <rect key="frame" x="20" y="559" width="44" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ERa-t0-9Rm">
+                                <rect key="frame" x="72" y="559" width="11" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Roll:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="i9I-sI-F19">
+                                <rect key="frame" x="123" y="559" width="33" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="erP-nH-9xT">
+                                <rect key="frame" x="164" y="559" width="11" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="FP5-on-cHH" firstAttribute="centerY" secondItem="t26-mM-4dS" secondAttribute="centerY" id="69B-oM-jp9"/>
+                            <constraint firstItem="025-ez-RMG" firstAttribute="top" secondItem="erP-nH-9xT" secondAttribute="bottom" constant="20" id="BNH-wW-033"/>
+                            <constraint firstItem="i9I-sI-F19" firstAttribute="leading" secondItem="ERa-t0-9Rm" secondAttribute="trailing" constant="40" id="Bmj-vV-AUe"/>
+                            <constraint firstItem="ERa-t0-9Rm" firstAttribute="leading" secondItem="T4o-C1-iD0" secondAttribute="trailing" constant="8" id="DvR-ty-GGe"/>
+                            <constraint firstItem="025-ez-RMG" firstAttribute="top" secondItem="T4o-C1-iD0" secondAttribute="bottom" constant="20" id="SX1-hw-cdm"/>
                             <constraint firstItem="QgM-rE-5cx" firstAttribute="centerX" secondItem="t26-mM-4dS" secondAttribute="centerX" id="UK8-Cd-NgL"/>
                             <constraint firstItem="S0v-nN-8ct" firstAttribute="top" secondItem="lIQ-mz-umg" secondAttribute="bottom" constant="92" id="a8Q-an-cdt"/>
                             <constraint firstItem="025-ez-RMG" firstAttribute="top" secondItem="QgM-rE-5cx" secondAttribute="bottom" constant="92" id="aGP-V7-Lz7"/>
+                            <constraint firstItem="T4o-C1-iD0" firstAttribute="leading" secondItem="t26-mM-4dS" secondAttribute="leadingMargin" id="flF-eO-bNf"/>
+                            <constraint firstItem="025-ez-RMG" firstAttribute="top" secondItem="i9I-sI-F19" secondAttribute="bottom" constant="20" id="h1w-9a-5Xx"/>
+                            <constraint firstItem="erP-nH-9xT" firstAttribute="leading" secondItem="i9I-sI-F19" secondAttribute="trailing" constant="8" id="m9j-dQ-tWu"/>
+                            <constraint firstItem="025-ez-RMG" firstAttribute="top" secondItem="ERa-t0-9Rm" secondAttribute="bottom" constant="20" id="mx2-Fc-xVM"/>
                             <constraint firstItem="Qyi-Sw-xdt" firstAttribute="centerY" secondItem="t26-mM-4dS" secondAttribute="centerY" id="nkt-pU-nVI"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Qyi-Sw-xdt" secondAttribute="trailing" constant="24" id="t86-ls-4fT"/>
                             <constraint firstItem="S0v-nN-8ct" firstAttribute="centerX" secondItem="t26-mM-4dS" secondAttribute="centerX" id="wwp-zd-Y0k"/>
                             <constraint firstItem="FP5-on-cHH" firstAttribute="leading" secondItem="t26-mM-4dS" secondAttribute="leadingMargin" constant="16" id="yIO-BO-5xP"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="pitchLabel" destination="ERa-t0-9Rm" id="1AL-M1-5sI"/>
+                        <outlet property="rollLabel" destination="erP-nH-9xT" id="LUw-bG-cwQ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XTX-lC-Pt7" sceneMemberID="firstResponder"/>
             </objects>
