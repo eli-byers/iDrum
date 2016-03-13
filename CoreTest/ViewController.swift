@@ -39,7 +39,7 @@ class ViewController: UIViewController {
     // acceleration control variables
     let limit = 5.5
     let center = 0.0
-    let resetDelay = 0.1
+    let resetDelay = 0.2
     
     // managers
     var motionManager = CMMotionManager()
@@ -140,61 +140,24 @@ class ViewController: UIViewController {
     
     func outputAccData(acceleration: CMAcceleration){
         
-        // put acceleratins in object and only pass on the largest one <-- need to do
-        
-//        switch (acceleration.x < -limit, acceleration.z < -limit, acceleration.x > limit){
-//            case (true, _, _):
-//                if (!frontDrumMove && !rightDrumMove) {
-//                    leftDrumMove = true
-//                }
-//            case (_, true, _):
-//                if (!leftDrumMove && !rightDrumMove) {
-//                    frontDrumMove = true
-//                }
-//            case (_, _, true):
-//                if (!leftDrumMove && !frontDrumMove) {
-//                    rightDrumMove = true
-//                }
-//            
-//            case (false, _, _): leftDrumMove = false
-//            case (_, false, _): frontDrumMove = false
-//            case (_, _, false): rightDrumMove = false
-//            default: break
-//        }
-//        
-//        switch (leftDrumMove, frontDrumMove, rightDrumMove) {
-//            case (true, _, _):
-//                if acceleration.x >= -center {
-//                    leftDrum()
-//                }
-//            case (_, true, _):
-//                if acceleration.z >= center {
-//                    frontDrum()
-//                }
-//            case (_, _, true):
-//                if acceleration.x <= center {
-//                    rightDrum()
-//                }
-//            default: break
-//        }
         
         if noDrum() && acceleration.x < -limit {
             leftDrumMove = true
-        } else if leftDrumMove && acceleration.x >= -center {
+        } else if leftDrumMove && acceleration.x >= -limit {
             leftDrumMove = false
             leftDrum()
         }
 
         if noDrum() && acceleration.x > limit {
             rightDrumMove = true
-        } else if rightDrumMove && acceleration.x <= center {
+        } else if rightDrumMove && acceleration.x <= limit {
             rightDrumMove = false
             rightDrum()
         }
 
         if noDrum() && acceleration.z < -limit {
             frontDrumMove = true
-        } else if frontDrumMove && acceleration.z >= center {
+        } else if frontDrumMove && acceleration.z >= -limit {
             frontDrumMove = false
             frontDrum()
         }
